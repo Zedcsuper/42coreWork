@@ -1,0 +1,37 @@
+CC=gcc
+FLAGC= -Wall -Werror -Wextra -I libft.h
+AR=ar crs
+RM=rm -rf
+FILES= $(wildcard *.c)
+#BFILES= ft_lstnew ft_lstadd_front\
+#	ft_lstsize ft_lstlast ft_lstadd_back ft_lstdelone \
+#	ft_lstclear ft_lstiter ft_lstmap
+OBJ=$(FILES:.c=.o)
+#BOBJ=$(BFILES:=.o)
+NAME=libft.a
+
+RED = \033[1;31m
+GREEN = \033[1;32m
+YELLOW = \033[1;33m
+BLUE = \033[1;34m
+REST = \033[0m
+
+.PHONY: all bonus clean fclean re
+
+all: $(NAME)
+	@echo "$(GREEN)-------libft done-----$(REST)"
+
+bonus: all $(BOBJ)
+	@$(AR) $(NAME) $(BOBJ)
+	@echo "$(GREEN)-------bonus done-----$(REST)"
+
+$(NAME): $(OBJ)
+	@$(AR) $(NAME) $(OBJ)
+
+%.o: %.c libft.h
+	$(CC) $(FLAGS) -c $< -o $@
+clean:
+	$(RM) $(OBJ) $(BOBJ)
+fclean:
+	$(RM) $(NAME)
+re: fclean all
