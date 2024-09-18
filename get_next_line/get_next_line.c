@@ -6,13 +6,13 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/17 19:59:32 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/09/17 21:20:30 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/09/18 13:53:08 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_update_bufs(char *bufs)
+char	*update_bufs(char *bufs)
 {
 	size_t	i;
 	size_t	j;
@@ -28,7 +28,7 @@ char	*ft_update_bufs(char *bufs)
 	}
 	if (bufs[i] == '\n')
 		i++;
-	updated = (char *)malloc(sizeof(char) * (ft_strlen_gnl(bufs) - i + 1));
+	updated = (char *)malloc(sizeof(char) * (ft_strlen(bufs) - i + 1));
 	if (!updated)
 		return (NULL);
 	j = -1;
@@ -39,12 +39,12 @@ char	*ft_update_bufs(char *bufs)
 	return (updated);
 }
 
-char	*ft_get_line(char *bufs)
+char	*get_line_from_buf(char *bufs)
 {
 	size_t	i;
 	char	*line;
 
-	if (!bufs || !bufs[0])
+	if (!bufs[0])
 		return (NULL);
 	i = 0;
 	while (bufs[i] && bufs[i] != '\n')
@@ -66,7 +66,7 @@ char	*ft_get_line(char *bufs)
 	return (line);
 }
 
-char	*ft_add_bufs(int fd, char *bufs)
+char	*add_bufs(int fd, char *bufs)
 {
 	char	*tmp_buf;
 	int		byte_read;
@@ -75,7 +75,7 @@ char	*ft_add_bufs(int fd, char *bufs)
 	if (!tmp_buf)
 		return (NULL);
 	byte_read = 1;
-	while (!ft_strchr_gnl(bufs, '\n') && byte_read != 0)
+	while (!ft_strchr(bufs, '\n') && byte_read != 0)
 	{
 		byte_read = read(fd, tmp_buf, BUFFER_SIZE);
 		if (byte_read == -1)
@@ -85,7 +85,7 @@ char	*ft_add_bufs(int fd, char *bufs)
 			return (NULL);
 		}
 		tmp_buf[byte_read] = '\0';
-		bufs = ft_strjoin_gnl(bufs, tmp_buf);
+		bufs = ft_strjoin(bufs, tmp_buf);
 	}
 	free(tmp_buf);
 	return (bufs);
@@ -98,10 +98,10 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	bufs = ft_add_bufs(fd, bufs);
+	bufs = add_bufs(fd, bufs);
 	if (!bufs)
 		return (NULL);
-	line = ft_get_line(bufs);
-	bufs = ft_update_bufs(bufs);
+	line = get_line_from_buf(bufs);
+	bufs = update_bufs(bufs);
 	return (line);
 }

@@ -6,13 +6,13 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/17 19:42:55 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/09/17 19:58:26 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/09/18 13:47:07 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen_gnl(char *s)
+size_t	ft_strlen(char *s)
 {
 	size_t	i;
 
@@ -22,7 +22,7 @@ size_t	ft_strlen_gnl(char *s)
 	return (i);
 }
 
-char	*ft_strchr_gnl(char *s, int c)
+char	*ft_strchr(char *s, int c)
 {
 	size_t	i;
 
@@ -40,14 +40,14 @@ char	*ft_strchr_gnl(char *s, int c)
 	return (NULL);
 }
 
-char	*ft_strdup_gnl(char *s)
+char	*ft_strdup(char *s)
 {
 	int		i;
 	int		len;
 	char	*dst;
 
 	i = 0;
-	len = ft_strlen_gnl(s);
+	len = ft_strlen(s);
 	dst = (char *)malloc(sizeof(char) * len + 1);
 	if (!dst)
 		return (NULL);
@@ -60,17 +60,17 @@ char	*ft_strdup_gnl(char *s)
 	return (dst);
 }
 
-char	*ft_strjoin_gnl(char *s1, char *s2)
+char	*ft_strjoin(char *s1, char *s2)
 {
 	size_t	i;
 	size_t	j;
 	char	*tmp;
 
 	if (!s1)
-		return (ft_strdup_gnl(s2));
+		return (ft_strdup(s2));
 	i = 0;
 	j = 0;
-	tmp = (char *)malloc(ft_strlen_gnl(s1) + ft_strlen_gnl(s2) + 1);
+	tmp = (char *)malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (!tmp)
 		return (NULL);
 	while (s1[i])
