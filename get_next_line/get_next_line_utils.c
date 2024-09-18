@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/17 19:42:55 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/09/18 13:47:07 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/09/18 14:30:30 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,10 @@ char	*ft_strjoin(char *s1, char *s2)
 	char	*tmp;
 
 	if (!s1)
+	{
+		free(s1);
 		return (ft_strdup(s2));
+	}
 	i = 0;
 	j = 0;
 	tmp = (char *)malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
