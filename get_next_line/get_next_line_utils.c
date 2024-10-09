@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/17 19:42:55 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/09/18 14:30:30 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/10/09 20:45:19 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ char	*ft_strjoin(char *s1, char *s2)
 
 	if (!s1)
 	{
-		free(s1);
+	//	free(s1);
 		return (ft_strdup(s2));
 	}
 	i = 0;

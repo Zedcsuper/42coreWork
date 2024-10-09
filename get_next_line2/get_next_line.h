@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                     :+:      :+:    :+:   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/06 22:46:26 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/10/06 22:46:51 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/10/06 23:53:17 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 512
 # endif
-# if BUFFER_SIZE >= 1000000
-#  undef BUFFER_SIZE
-#  define BUFFER_SIZE 512
-# endif
+//# if BUFFER_SIZE >= 1000000
+//#  undef BUFFER_SIZE
+//#  define BUFFER_SIZE 512
+//# endif
 
 # include <stdlib.h>
 # include <unistd.h>
