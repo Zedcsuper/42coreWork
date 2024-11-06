@@ -6,16 +6,16 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:14 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/11/03 22:42:47 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/11/06 20:40:18 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "so_long.h"
+#include "./includes/so_long.h"
 
 static void	args_check(int argc, char **argv)
 {
 	if (argc != 2)
-		panic(NULL, INVALID_NBR_ARGS);
+		panic(NULL,  INVALID_NBR__ARGS);
 	if (*argv[1] == '\0')
 		panic(NULL, NULL_MAP);
 }

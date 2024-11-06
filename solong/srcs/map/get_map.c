@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 15:17:06 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/11/04 16:06:01 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/11/06 22:25:56 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,11 @@ static void	get_lines(char *map_file, t_game *game)
 	map_fd = open(map_file, O_RDONLY);
 	if (map_fd == -1)
 		panic(game, OPEN_MAP_FILE_ERR);
+	i = 0;
+	while (i < game->map.rows)
+		game->map.map[i++] = get_next_line(map_fd);
+	game->map.map[i] = NULL;
+	close(map_fd);
 	i = 0;
 	while (i < game->map.rows - 1)
 	{

@@ -6,13 +6,13 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 00:32:03 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/11/05 23:26:11 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/11/06 21:29:01 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/so_long.h"
 
-void	put_plyaer_tile(t_game *game)
+void	put_player_tile(t_game *game)
 {
 	char	*moves_str;
 
@@ -83,5 +83,5 @@ void	update_player_pos(t_game *game, bool horizontal, int length)
 		game->map.player_pos.y += length;
 	}
 	which_tile(game);
-	put_plyaer_tile(game);
+	put_player_tile(game);
 }
