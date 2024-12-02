@@ -1,48 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.c                                           :+:      :+:    :+:   */
+/*   normtest.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/07 21:27:53 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/11/24 20:42:11 by zjamaien         ###   ########.fr       */
+/*   Created: 2024/11/24 23:05:56 by zjamaien          #+#    #+#             */
+/*   Updated: 2024/11/24 23:15:40 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minitalk.h"
-
-static void	ft_btoa(int sig)
-{
-	static int	bit;
-	static int	c;
-	static int	prev_c;	
-
-	if (sig == SIGUSR1)
-		c |= (0x01 << bit);
-	bit++;
-	if (bit == 8)
-	{
-		ft_printf("%c", c);
-		bit = 0;
-		prev_c = c;
-		c = 0;
-	}
-	if (prev_c == '\0')
-		kill(client_pid, SIGUSR1);
-}
+#include <stdio.h>
 
 int	main(void)
 {
-	int	pid;
+	int	arr[2];
+	int	i;
 
-	pid = getpid();
-	ft_printf("%d\n", pid);
-	while (1)
+	i = 0;
+	while (i < 2)
 	{
-		signal(SIGUSR1, ft_btoa);
-		signal(SIGUSR2, ft_btoa);
-		pause();
+		arr[i] = (int[]){1, 2}[i];
+		i++;
 	}
+	printf("arr[0] = %d, arr[1] = %d\n", arr[0], arr[1]);
 	return (0);
 }
