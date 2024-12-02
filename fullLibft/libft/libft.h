@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 23:57:33 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/12/02 19:39:05 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/12/02 23:33:26 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <stdarg.h>
+# include <fcntl.h>
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 1

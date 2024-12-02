@@ -6,19 +6,12 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 14:53:50 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/08/23 22:08:52 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/09/04 20:29:59 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <stdio.h>
-/*
-void	ft_bzero(void *s, size_t n)
-{
-	while (n--)
-		*((unsigned char *)(s + n)) = 0;
-}
-*/
+
 void	ft_bzero(void *s, size_t n)
 {
 	unsigned char	*ptr;

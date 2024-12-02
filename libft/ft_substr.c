@@ -6,12 +6,11 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 14:53:50 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/08/18 14:53:50 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/09/04 20:37:45 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <stdio.h>
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
@@ -22,7 +21,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	if (!s)
 		return (NULL);
 	if (start > ft_strlen(s))
-		return ((char *)ft_calloc(1, sizeof(char)));
+		return ((char *) ft_calloc(1, sizeof(char)));
 	if (ft_strlen(s) <= start + len)
 		substr = malloc(sizeof(char) * (ft_strlen(s) - start + 1));
 	else
@@ -35,18 +34,19 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (substr);
 }
 /*
-int	main(void)
+int main(void)
 {
-	char	*str;
-	char	*sub;
+    char *str = "Hello, World!";
+    char *sub;
 
-	str = "Hello, World!";
-	sub = ft_substr(str, 7, 0);   // Expected output: "World"
-	printf("Substring: %s\n", sub);
-	free(sub);
-	sub = ft_substr(str, 20, 0);  // Expected output: "" (empty string)
-	printf("Substring: %s\n", sub);
-	free(sub);
-	return (0);
+    sub = ft_substr(str, 7, 0);   // Expected output: "World"
+    printf("Substring: %s\n", sub);
+    free(sub);
+
+    sub = ft_substr(str, 20, 0);  // Expected output: "" (empty string)
+    printf("Substring: %s\n", sub);
+    free(sub);
+
+    return 0;
 }
 */

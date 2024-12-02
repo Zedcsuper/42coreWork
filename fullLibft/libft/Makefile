@@ -8,7 +8,7 @@ RM=rm -rf
 
 OBJ_DIR=obj_dir
 
-FILES= ft_atoi.c \
+FILES=ft_atoi.c \
 	ft_bzero.c \
 	ft_calloc.c \
 	ft_isalnum.c \
@@ -32,6 +32,7 @@ FILES= ft_atoi.c \
 	ft_memmove.c \
 	ft_memset.c \
 	ft_numbers.c \
+	ft_numbers.c \
 	ft_printf.c \
 	ft_putchar_fd.c \
 	ft_putendl_fd.c \
@@ -39,6 +40,7 @@ FILES= ft_atoi.c \
 	ft_putstr_fd.c \
 	ft_split.c \
 	ft_strchr.c \
+	ft_string.c \
 	ft_striteri.c \
 	ft_strjoin.c \
 	ft_strlcat.c \
@@ -52,7 +54,7 @@ FILES= ft_atoi.c \
 	ft_substr.c \
 	get_next_line.c \
 	get_next_line_utils.c
-
+     
 OBJ=$(addprefix $(OBJ_DIR)/, $(FILES:.c=.o))
 
 NAME=libft.a

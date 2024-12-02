@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 14:53:50 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/08/18 14:53:50 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/09/04 21:24:48 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,10 @@ char	*ft_strtrim(char const *s1, char const *set)
 	end = ft_strlen(s1) - 1;
 	while (s1[start] && ft_strchr(set, s1[start]))
 		start++;
+	if (start == end + 1)
+		return (ft_substr(s1, start, 0));
 	while (s1[end] && ft_strchr(set, s1[end]))
 		end--;
-	if (end == -1)
-		return (ft_substr(s1, start, 0));
 	return (ft_substr(s1, start, (end - start + 1)));
 }
 /*

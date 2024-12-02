@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 14:53:50 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/08/18 14:53:50 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/08/27 15:53:23 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,10 @@ void	ft_putstr_fd(char *s, int fd)
 	while (*s)
 		ft_putchar_fd(*(s++), fd);
 }
-
 /*
-int	main(void)
+int	main()
 {
-	int	fd;
-
-	fd = open("txt.txt", O_RDWR | O_CREAT);
+	int fd = open("txt.txt", O_RDWR | O_CREAT);
 	ft_putstr_fd("hi every body", fd);
 	close(fd);
 	return (0);

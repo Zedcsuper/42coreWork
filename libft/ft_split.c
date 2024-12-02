@@ -3,111 +3,104 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: zjamaien <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/31 20:13:04 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/08/31 20:31:47 by zjamaien         ###   ########.fr       */
+/*   Created: 2024/08/30 19:02:51 by zjamaien          #+#    #+#             */
+/*   Updated: 2024/08/30 19:03:44 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "libft.h"
 
-char	**malloc_free(char **av)
+static char	**malloc_error(char **tab)
 {
-	int	i;
+	unsigned int	i;
 
 	i = 0;
-	while (av[i])
-		free(av[i++]);
-	free(av);
+	while (tab[i])
+		free(tab[i++]);
+	free(tab);
 	return (NULL);
 }
 
-int	count_word(char *s, char c)
+static int	word_count(const char *str, char c)
 {
 	int	i;
 	int	count;
 
 	i = 0;
 	count = 0;
-	while (s[i])
+	while (str[i])
 	{
-		if (s[i] == c)
+		if (str[i] == c)
 			i++;
 		else
 		{
 			count++;
-			while (s[i] != c && s[i])
+			while (str[i] != c && str[i])
 				i++;
 		}
 	}
 	return (count);
 }
 
-char	*ft_strncpy(char *dst, char *src, int len)
+static char	*ft_getword(const char *s1, int *index, char c)
 {
-	while (len--)
-		*dst++ = *src++;
-	*dst = '\0';
-	return (dst);
-}
-
-char	*create_word(int *index, char *str, char c)
-{
-	int		i;
-	char	*word;
-
-	i = *index;
-	while (str[*index] != c && str[*index])
-		(*index)++;
-	word = malloc(sizeof(char) * (*index - i + 1));
-	if (!word)
-		return (NULL);
-	ft_strncpy(word, &str[i], (*index) - i);
-	return (word);
-}
-
-char	**ft_split(char *str, char c)
-{
-	int		index;
-	char	**arr;
-	int		wc;
+	char	*copy;
+	size_t	word_len;
 	int		i;
 
 	i = 0;
-	wc = count_word(str, c);
+	word_len = 0;
+	while (s1[*index + word_len] && s1[*index + word_len] != c)
+		word_len++;
+	copy = malloc(sizeof(char) * (word_len + 1));
+	if (!copy)
+		return (NULL);
+	i = 0;
+	while (s1[*index] && s1[*index] != c)
+		copy[i++] = s1[(*index)++];
+	copy[i] = '\0';
+	return (copy);
+}
+
+char	**ft_split(char const *s, char c)
+{
+	char	**arr;
+	int		index;
+	int		wc;
+	int		i;
+
 	index = 0;
+	i = 0;
+	if (!s)
+		return (NULL);
+	wc = word_count(s, c);
 	arr = malloc(sizeof(char *) * (wc + 1));
 	if (!arr)
 		return (NULL);
 	while (i < wc)
 	{
-		while (str[index] == c)
+		while (s[index] == c && s[index])
 			index++;
-		if (str[index])
-			arr[i] = create_word(&index, str, c);
+		arr[i] = ft_getword(s, &index, c);
 		if (!arr[i])
-			return (malloc_free(arr));
+			return (malloc_error(arr));
 		i++;
 	}
-	arr[i] = NULL;
+	arr[i] = 0;
 	return (arr);
 }
 /*
-int	main(void)
+int	main()
 {
-	char	*s;
-	int		wc;
-	int		i;
-	char	**ar;
-
-	s = "abc efg";
-	wc = count_word(s, ' ');
-	i = 0;
-	ar = ft_split(s, ' ');
-	while (i < wc)
-		printf("%d :%s\n", i, ar[i++]);
+	char *str = "hello mother fucker";
+	char **arr = ft_split(str, ' ');
+	int i = 0;
+	while (arr[i] != 0)
+		printf("%s\n", arr[i++]);
+		
+	malloc_error(arr);
 	return (0);
 }
 */

@@ -1,44 +1,86 @@
-CC=gcc
+CC=cc
+
 CFLAGS= -Wall -Werror -Wextra
+
 AR=ar crs
+
 RM=rm -rf
-FILES= ft_isalpha ft_isdigit ft_isalnum ft_isascii ft_strlen \
-	ft_toupper ft_tolower ft_strchr ft_strrchr ft_strncmp \
-	ft_strnstr ft_strlcpy ft_strlcat ft_atoi ft_strdup\
-	ft_substr ft_strjoin ft_split ft_itoa ft_strmapi \
-	ft_putchar_fd ft_putstr_fd ft_putendl_fd ft_isprint\
-	ft_putnbr_fd ft_strtrim ft_memcpy ft_memmove ft_memset\
-	ft_memcmp ft_memchr ft_bzero ft_calloc ft_striteri \
-	get_next_line/get_next_line get_next_line/get_next_line_utils
-BFILES= ft_lstnew ft_lstadd_front ft_lstsize ft_lstlast \
-	ft_lstadd_back ft_lstdelone ft_lstclear ft_lstiter ft_lstmap
 
-OBJ=$(FILES:=.o)
-BOBJ=$(BFILES:=.o)
-FT_PRINTF_DIR = ../ft_printf
-FT_PRINTF_LIB = $(FT_PRINTF_DIR)/libftprintf.a
+OBJ_DIR=obj_dir
+
+FILES=ft_atoi.c \
+	ft_bzero.c \
+	ft_calloc.c \
+	ft_isalnum.c \
+	ft_isalpha.c \
+	ft_isascii.c \
+	ft_isdigit.c \
+	ft_isprint.c \
+	ft_itoa.c \
+	ft_lstadd_back.c \
+	ft_lstadd_front.c \
+	ft_lstclear.c \
+	ft_lstdelone.c \
+	ft_lstiter.c \
+	ft_lstlast.c \
+	ft_lstmap.c \
+	ft_lstnew.c \
+	ft_lstsize.c \
+	ft_memchr.c \
+	ft_memcmp.c \
+	ft_memcpy.c \
+	ft_memmove.c \
+	ft_memset.c \
+	ft_numbers.c \
+	ft_numbers.c \
+	ft_printf.c \
+	ft_putchar_fd.c \
+	ft_putendl_fd.c \
+	ft_putnbr_fd.c \
+	ft_putstr_fd.c \
+	ft_split.c \
+	ft_strchr.c \
+	ft_string.c \
+	ft_striteri.c \
+	ft_strjoin.c \
+	ft_strlcat.c \
+	ft_strlcpy.c \
+	ft_strlen.c \
+	ft_strmapi.c \
+	ft_strncmp.c \
+	ft_strnstr.c \
+	ft_strrchr.c \
+	ft_strtrim.c \
+	ft_substr.c \
+	get_next_line.c \
+	get_next_line_utils.c
+     
+OBJ=$(addprefix $(OBJ_DIR)/, $(FILES:.c=.o))
+
 NAME=libft.a
-
 
 all: $(NAME)
 
-bonus: $(OBJ) $(BOBJ)
-	$(AR) $(NAME) $(BOBJ)
-
 $(NAME): $(OBJ)
-	$(MAKE) -C $(FT_PRINTF_DIR)
-	$(AR) $(NAME) $(OBJ) $(FT_PRINTF_DIR)/*.o
+	@echo "Archiving library files into $(NAME)..."
+	@$(AR) $(NAME) $(OBJ)
+	@echo "$(NAME) created successfully."
 
-%.o: %.c libft.h
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: %.c libft.h | $(OBJ_DIR)
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR):
+	@echo "Creating $(OBJ_DIR) directory..."
+	@mkdir -p $(OBJ_DIR)
 
 clean:
-	$(RM) $(OBJ) $(BOBJ)
-	$(MAKE) -C $(FT_PRINTF_DIR) clean
+	@echo "Cleaning object files..."
+	@$(RM) $(OBJ_DIR)
 
 fclean: clean
-	$(RM) $(NAME)
-	$(MAKE) -C $(FT_PRINTF_DIR) fclean
+	@echo "Removing $(NAME)..."
+	@$(RM) $(NAME)
 
 re: fclean all
+
 .PHONY: all bonus clean fclean re

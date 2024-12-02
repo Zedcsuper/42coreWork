@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 14:53:50 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/08/30 23:55:25 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/08/27 15:52:52 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,11 @@ void	ft_putnbr_fd(int n, int fd)
 	}
 }
 /*
-int	main(void)
+int	main()
 {
-	int				fd;
-	unsigned int	x;
-
-	fd = open("txt1.txt", O_RDWR | O_CREAT, 0644);
+	int fd = open("txt1.txt", O_RDWR | O_CREAT, 0644);
 	ft_putnbr_fd(-2147483648, fd);
-	x = -99;
+	unsigned int x = -99;
 	printf("%u\n", x);
 	return (0);
 }
