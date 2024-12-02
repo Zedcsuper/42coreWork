@@ -8,7 +8,8 @@ RM=rm -rf
 
 OBJ_DIR=obj_dir
 
-FILES=ft_atoi.c \
+FILES=\
+	ft_atoi.c \
 	ft_bzero.c \
 	ft_calloc.c \
 	ft_isalnum.c \
@@ -52,6 +53,8 @@ FILES=ft_atoi.c \
 	ft_strrchr.c \
 	ft_strtrim.c \
 	ft_substr.c \
+	ft_tolower.c \
+	ft_toupper.c \
 	get_next_line.c \
 	get_next_line_utils.c
      
