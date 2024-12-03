@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:44:35 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/11/05 21:37:52 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/12/03 20:51:06 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include "keys.h"
 # include "error_messages.h"
 # include "../mlx/mlx.h"
+# include <stdbool.h>
 # define OPEN_SPACE '0'
 # define WALL '1'
 # define EXIT 'E'
@@ -92,5 +93,6 @@ int		quit_game(t_game *game);
 void	panic(t_game *game, char *error_msg);
 void	destroy(t_game *game);
 void	free_matrix(char **matrix);
+bool	is_onstr(const char *str, int ch);
 
 #endif
