@@ -6,12 +6,12 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:14 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/12/04 00:17:36 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/12/04 22:29:26 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/so_long.h"
-
+//hi
 static void	args_check(int argc, char **argv)
 {
 	if (argc != 2)

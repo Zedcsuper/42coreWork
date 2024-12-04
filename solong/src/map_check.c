@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 19:18:06 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/12/04 00:19:23 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/12/05 00:01:59 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static void	check_elemnts(t_game *game)
 		j = -1;
 		while (++j < game->map.columns)
 		{
-			if (!is_onstr(VALID_ENTITIES, game->map.map[i][j]))
+			if (!ft_strchr(VALID_ENTITIES, game->map.map[i][j]))
 				panic(game, INVALID_ENTITY);
 			if (game->map.map[i][j] == EXIT)
 				game->map.exit += 1;
@@ -74,8 +74,11 @@ static bool	valid_form(t_game *game)
 	while (game->map.map[i] != NULL)
 	{
 		if (len != ft_strlen(game->map.map[i]))
+		{
+			ft_printf("%d %d %d [%d]\n", len, ft_strlen(game->map.map[i]), i, game->map.map[i][13]);
 			return (false);
-		i += 1;
+		}
+		i++;
 	}
 	return (true);
 }
@@ -83,7 +86,10 @@ static bool	valid_form(t_game *game)
 void	map_check(t_game *game)
 {
 	if (!valid_form(game))
+	{
+		ft_printf("1111\n");
 		panic(game, INVALID_FORMAT);
+	}
 	check_elemnts(game);
 	if (!is_closed(&game->map))
 		panic(game, MAP_NOT_CLOSED);

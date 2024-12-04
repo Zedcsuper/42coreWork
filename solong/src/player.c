@@ -6,12 +6,12 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 00:32:03 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/11/06 21:29:01 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/12/04 22:30:37 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/so_long.h"
-
+//hi
 void	put_player_tile(t_game *game)
 {
 	char	*moves_str;
