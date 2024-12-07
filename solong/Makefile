@@ -24,32 +24,34 @@ SRCS =\
 	src/render_map.c \
 	src/player.c \
 	src/destroy.c \
-	src/is_onstr.c \
 	src/panic.c
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.c=.o)))
 
-all : $(NAME)
+all: $(NAME)
 
-$(NAME) : $(OBJ_DIR) $(OBJS)
-	$(MAKE) -C ./libft
+$(NAME): $(OBJS) $(LIBFT)
 	$(MAKE) -C ./mlx
 	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(MLXFLAGS) -o $(NAME)
 
-$(OBJ_DIR)/%.o : src/%.c | $(OBJ_DIR)
+$(LIBFT):
+	$(MAKE) -C ./libft
+
+$(OBJ_DIR)/%.o: src/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
-clean :
+clean:
 	$(MAKE) clean -C ./libft
+	$(MAKE) clean -C ./mlx
 	$(RM) $(OBJ_DIR)
 
-fclean : clean
+fclean: clean
 	$(MAKE) fclean -C ./libft
 	$(RM) $(NAME)
 
-re : fclean all
+re: fclean all
 
 .PHONY: all clean fclean re

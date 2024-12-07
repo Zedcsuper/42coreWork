@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:44:35 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/12/03 20:51:06 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/12/06 18:56:38 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,24 +61,6 @@ typedef struct s_game
 }	t_game;
 
 /*this function should not be here*/
-static inline t_game	init_game(void)
-{
-	return ((t_game){
-		.map.map = NULL,
-		.map.rows = 0,
-		.map.columns = 0,
-		.map.collectibles = 0,
-		.map.exit = 0,
-		.map.player = 0,
-		.tiles.collectible = NULL,
-		.tiles.exit = NULL,
-		.tiles.floor = NULL,
-		.tiles.player = NULL,
-		.tiles.wall = NULL,
-		.moves = -1,
-	});
-}
-
 /*parses and save the given map*/
 void	get_map(char *map_file, t_game *game);
 void	check_path(t_game *game);

@@ -5,103 +5,119 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/17 19:59:32 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/12/02 19:35:35 by zjamaien         ###   ########.fr       */
+/*   Created: 2024/12/06 23:06:41 by zjamaien          #+#    #+#             */
+/*   Updated: 2024/12/07 01:33:32 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static char	*update_bufs(char *bufs)
+static char	*ft_strjoin_gnl(char *s1, char *s2, int *eol_loc)
 {
-	size_t	i;
-	size_t	j;
-	char	*updated;
+	char	*result;
+	size_t	len1;
+	size_t	len2;
 
-	i = 0;
-	while (bufs[i] && bufs[i] != '\n')
-		i++;
-	if (!bufs[i])
+	if (!s1 || !s2)
+		return (NULL);
+	len1 = ft_strlen(s1);
+	len2 = ft_strlen(s2);
+	result = (char *)malloc(sizeof(char) * (len1 + len2 + 1));
+	if (!result)
 	{
-		free(bufs);
+		free(s1);
 		return (NULL);
 	}
-	if (bufs[i] == '\n')
-		i++;
-	updated = (char *)malloc(sizeof(char) * (ft_gnlstrlen(bufs) - i + 1));
-	if (!updated)
-		return (NULL);
-	j = -1;
-	while (bufs[i + (++j)])
-		updated[j] = bufs[i + j];
-	updated[j] = '\0';
-	free(bufs);
-	return (updated);
+	ft_memcpy(result, s1, len1);
+	free(s1);
+	ft_memcpy(result + len1, s2, len2 + 1);
+	if (len1 + len2 > 0 && *(result + len1 + len2 - 1) == '\n')
+		*eol_loc = 0;
+	return (result);
 }
 
-static char	*get_line_from_buf(char *bufs)
+static char	*init_line(char *stash, int *eol_loc)
 {
-	size_t	i;
+	size_t	len;
 	char	*line;
 
-	if (!bufs[0])
-		return (NULL);
-	i = 0;
-	while (bufs[i] && bufs[i] != '\n')
-		i++;
-	if (bufs[i] == '\n')
-		i++;
-	line = (char *)malloc(sizeof(char) * i + 1);
+	len = 0;
+	while (stash[len] && stash[len] != '\n')
+		len++;
+	len++;
+	line = malloc(sizeof(char) * (len + 1));
 	if (!line)
 		return (NULL);
-	i = 0;
-	while (bufs[i] && bufs[i] != '\n')
-	{
-		line[i] = bufs[i];
-		i++;
-	}
-	if (bufs[i] == '\n')
-		line[i++] = '\n';
-	line[i] = '\0';
+	ft_memcpy(line, stash, len);
+	line[len] = '\0';
+	if (len > 0 && line[len - 1] == '\n')
+		*eol_loc = len - 1;
 	return (line);
 }
 
-char	*add_bufs(int fd, char *bufs)
+static size_t	locate_eol(char *line)
 {
-	char	*tmp_buf;
-	int		byte_read;
+	size_t	i;
 
-	tmp_buf = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
-	if (!tmp_buf)
-		return (NULL);
-	byte_read = 1;
-	while (!ft_gnlstrchr(bufs, '\n') && byte_read != 0)
+	i = 0;
+	if (!line)
+		return (-1);
+	while (i < BUFFER_SIZE)
 	{
-		byte_read = read(fd, tmp_buf, BUFFER_SIZE);
-		if (byte_read == -1)
+		if (line[i] == '\n' || line[i] == '\0')
+			return (i + 1);
+		i++;
+	}
+	return (i);
+}
+
+static char	*extract_line(char *line, char *stash, int *eol_loc, int fd)
+{
+	char	buffer[BUFFER_SIZE + 1];
+	ssize_t	read_check;
+	size_t	line_size;
+
+	while (*eol_loc == -1)
+	{
+		ft_bzero(buffer, (BUFFER_SIZE + 1));
+		read_check = read(fd, buffer, BUFFER_SIZE);
+		if (read_check == -1)
 		{
-			free(tmp_buf);
-			free(bufs);
+			free(line);
+			ft_bzero(stash, (BUFFER_SIZE + 1));
 			return (NULL);
 		}
-		tmp_buf[byte_read] = '\0';
-		bufs = ft_gnlstrjoin(bufs, tmp_buf);
+		line_size = locate_eol(buffer);
+		ft_strlcpy(stash, &buffer[line_size], (BUFFER_SIZE + 1));
+		buffer[line_size] = '\0';
+		line = ft_strjoin_gnl(line, buffer, eol_loc);
+		if (read_check == 0)
+		{
+			ft_bzero(stash, BUFFER_SIZE + 1);
+			break ;
+		}
 	}
-	free(tmp_buf);
-	return (bufs);
+	return (line);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*bufs;
+	static char	stash[BUFFER_SIZE + 1];
 	char		*line;
+	int			eol_loc;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	bufs = add_bufs(fd, bufs);
-	if (!bufs)
+	eol_loc = -1;
+	line = init_line(stash, &eol_loc);
+	if (!line)
 		return (NULL);
-	line = get_line_from_buf(bufs);
-	bufs = update_bufs(bufs);
+	ft_strlcpy(stash, &stash[eol_loc + 1], BUFFER_SIZE + 1);
+	line = extract_line(line, stash, &eol_loc, fd);
+	if (!line || line[0] == '\0')
+	{
+		free(line);
+		return (NULL);
+	}
 	return (line);
 }

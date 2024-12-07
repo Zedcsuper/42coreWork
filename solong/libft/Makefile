@@ -56,8 +56,7 @@ FILES=\
 	ft_substr.c \
 	ft_tolower.c \
 	ft_toupper.c \
-	get_next_line.c \
-	get_next_line_utils.c
+	get_next_line.c 
      
 OBJ=$(addprefix $(OBJ_DIR)/, $(FILES:.c=.o))
 
@@ -66,12 +65,12 @@ NAME=libft.a
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	@echo "Archiving library files into $(NAME)..."
-	@$(AR) $(NAME) $(OBJ)
-	@echo "$(NAME) created successfully."
+	#@echo "Archiving library files into $(NAME)..."
+	$(AR) $(NAME) $(OBJ)
+	#@echo "$(NAME) created successfully."
 
 $(OBJ_DIR)/%.o: %.c libft.h | $(OBJ_DIR)
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR):
 	@echo "Creating $(OBJ_DIR) directory..."
@@ -87,4 +86,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all bonus clean fclean re
+.PHONY: all clean fclean re

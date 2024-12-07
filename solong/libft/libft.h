@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/25 23:57:33 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/12/02 23:33:26 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/12/07 01:32:44 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <fcntl.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1
+#  define BUFFER_SIZE 500
 # endif
 
 typedef struct s_list
@@ -79,12 +79,5 @@ void	ft_putunsignednbr_len(unsigned int u, int *len);
 void	ft_putptr_len(size_t ptr, int *len);
 int		ft_printf(const char *s, ...);
 char	*get_next_line(int fd);
-//char	*get_line_from_buf(char *s);
-//char	*add_bufs(int fd, char *bufs);
-//char	*update_bufs(char *bufs);
-char	*ft_gnlstrchr(char *s, int c);
-char	*ft_gnlstrdup(char *s);
-char	*ft_gnlstrjoin(char *s1, char *s2);
-size_t	ft_gnlstrlen(char *s);
 
 #endif

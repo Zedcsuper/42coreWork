@@ -6,7 +6,7 @@
 /*   By: zjamaien <zjamaien@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 15:17:06 by zjamaien          #+#    #+#             */
-/*   Updated: 2024/12/05 00:40:48 by zjamaien         ###   ########.fr       */
+/*   Updated: 2024/12/06 20:42:57 by zjamaien         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,13 @@ static void	get_nbr_rwos(char *map_file, t_game *game)
 	temp = get_next_line(map_fd);
 	while (temp)
 	{
-		counter += 1;
+		counter++;
 		free(temp);
 		temp = get_next_line(map_fd);
 	}
 	if (counter == 0)
 		panic(game, EMPITY_MAP_FILE);
 	game->map.rows = counter;
-	ft_printf("row %d\n", counter);
 	close(map_fd);
 }
 
@@ -50,7 +49,9 @@ static void	get_lines(char *map_file, t_game *game)
 {
 	int	map_fd;
 	int	i;
+	char	*temp;
 
+	temp = NULL;
 	map_fd = open(map_file, O_RDONLY);
 	if (map_fd == -1)
 		panic(game, OPEN_MAP_FILE_ERR);
@@ -58,23 +59,22 @@ static void	get_lines(char *map_file, t_game *game)
 	while (i < game->map.rows)
 	{
 		game->map.map[i] = get_next_line(map_fd);
-		ft_printf("%s", game->map.map[i]);
 		i++;
 	}
+	temp = NULL;
 	game->map.map[i] = NULL;
 	close(map_fd);
 	i = 0;
 	while (i < game->map.rows )
 	{
-		//game->map.map[i] = trim_free(game->map.map[i], "\n");
+		temp = game->map.map[i];
 		game->map.map[i] = ft_strtrim(game->map.map[i], "\n");
-		ft_printf("trim %s", game->map.map[i]);
+		free(temp);
 		if (!game->map.map[i])
 			panic(game, MALLOC_ERR);
 		i++;
 	}
 	game->map.columns = ft_strlen(game->map.map[0]);
-	ft_printf("columns %d\n", game->map.columns);
 }
 
 void	get_map(char *map_file, t_game *game)
