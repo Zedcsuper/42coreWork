@@ -1,0 +1,21 @@
+stages:
+  - build
+  - run
+
+build-job:
+  stage: build
+  image: gcc:latest
+  script:
+    - apt-get update && apt-get install -y libreadline-dev
+    - make
+  artifacts:
+    paths:
+      - minishell
+
+run-job:
+  stage: run
+  image: gcc:latest
+  script:
+    - ./minishell
+  needs:
+    - build-job
