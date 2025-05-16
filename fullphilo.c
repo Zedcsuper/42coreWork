@@ -1,401 +1,374 @@
-# include <unistd.h>
 # include <pthread.h>
-# include <sys/time.h>
-# include <string.h>
-# include <stdlib.h>
+# include <unistd.h>
 # include <stdio.h>
-
-# define ERROR		-1
-# define OFLOW		-2
-# define STDIN		0
-# define STDOUT		1
-# define STDERR		2
-# define GOOD		3
-# define ARGVALUE	4
-# define EOL		'\0'
-
-/*
- ** Philosopher struct
- ** Each philospher shoud have the same options: id[pid] number_of_ate[nta]
- ** last_time_ate[lta]
-*/
+# include <stdlib.h>
+# include <sys/time.h>
 
 typedef struct s_philo
 {
-	pthread_mutex_t	eating;
-	pthread_t		thd_philo;
-	pthread_t		myhem;
-	int				pid;
-	int				nta;
-	int				lf;
-	int				rf;
-	int				is_eating;
-	long long		lta;
-	struct s_din	*din_table;
-}				t_philo;
+	int				id;
+	int				eat_count;
+	int				l_fork;
+	int				r_fork;
+	long long		last_eat;
+	struct s_table	*table;
+	pthread_t		thread;
+}					t_philo;
 
-/*
- ** Each program should have the same options: number_of_philosophers[nop]
- ** time_to_die[ttd] time_to_eat[tte]
- ** time_to_sleep[tts] [number_of_times_each_philosopher_must_eat[ntpme]]
- ** starting_time[st]
- */
-
-typedef struct s_din
+typedef struct s_table
 {
-	pthread_mutex_t	*forks;
-	pthread_mutex_t	write;
-	t_philo			**philos;
-	long long		st;
-	int				death;
-	int				nop;
-	int				ttd;
-	int				tte;
-	int				tts;
-	int				ntpme;
-}	t_din;
+	int				philosophers;
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
+	int				must_eat_times;
+	int				ate_enough;
+	int				finish_flag;
+	long long		start_time;
+	t_philo			*philo;
+	pthread_mutex_t	*fork_padlock;
+	pthread_mutex_t	print_padlock;
+	pthread_mutex_t	eat_padlock;
+	pthread_mutex_t	finish_padlock;
+}					t_table;
 
-t_philo	**initialize_philosphers(t_din *din_table);
-pthread_mutex_t							*initialize_forks(t_din *din_table);
-int		ft_is_number(char *string);
-long long			ft_time_in_ms(void);
-int		ft_atoi(const char *str);
-void	*start_routine(void *data);
-void	print_status(t_din *din_table, int pid, char *string);
+# define TAKE "has taken a fork"
+# define EAT "is eating"
+# define SLEEP "is sleeping"
+# define THINK "is thinking"
+# define DIE "died"
+# define FINISH "f"
+# define FINISH_MSG "All philosophers ate enough!"
+# define YES 1
+# define NO 0
 
+void		advance_time(t_philo *philo, long long ms);
+void		print_action(t_philo *philo, const char *status);
+long long	now(void);
+int		exit_error(char *msg, t_table *table, int n);
+int			ft_atoi(const char *s);
 
-/*
- ** Mainly check arguments validity and return acceptance
- ** In case of an error a -1 is returned
- */
-int	check_arg_validity(int argSize, char **args)
+int			lone_philosopher(t_table *table);
+int		start_padlocks(t_table *table);
+int		call_philosophers(t_table *table);
+int		set_table(t_table *table, int ac, char **av);
+
+int			is_time_to_finish(t_philo *philo, int order);
+int			is_someone_dead_or_full(t_philo *philo);
+void		time_to_eat(t_philo *philo);
+void		*start_dinner(void *arg);
+int			turn_philosophers_in_threads(t_table *table);
+
+void		clean_table(t_table *table);
+void		destroy_padlocks(t_table *table);
+void		finish_dinner(t_table *table);
+void		start_dinner_monitor(t_table *table);
+
+int	is_time_to_finish(t_philo *philo, int finish_order)
 {
-	int	i;
-
-	i = 1;
-	if (argSize - 1 < ARGVALUE || argSize - 1 > 6)
-		return (ERROR);
-	while (i < argSize)
+	pthread_mutex_lock(&philo->table->finish_padlock);
+	if (finish_order || philo->table->finish_flag)
 	{
-		if (args[i][0] == '-' && ft_is_number(args[i]) != GOOD)
-			return (ERROR);
-		i++;
+		if (finish_order)
+			philo->table->finish_flag = 1;
+		pthread_mutex_unlock(&philo->table->finish_padlock);
+		return (1);
 	}
-	return (GOOD);
+	pthread_mutex_unlock(&philo->table->finish_padlock);
+	return (0);
 }
 
-/*
- ** Parse arguments into a valid struct
- ** Which we will use later
- */
-t_din	*fill_table(int argSize, char **args)
+int	is_someone_dead_or_full(t_philo *philo)
 {
-	t_din	*din_table;
-	int		counter;
-
-	counter = 1;
-	din_table = (t_din *) malloc(sizeof(t_din) * 1);
-	if (din_table == NULL)
-		return (NULL);
-	din_table->nop = ft_atoi(args[counter++]);
-	din_table->ttd = ft_atoi(args[counter++]);
-	din_table->tte = ft_atoi(args[counter++]);
-	din_table->tts = ft_atoi(args[counter++]);
-	din_table->ntpme = -1;
-	din_table->death = 1;
-	if (argSize - 1 == 5)
-		din_table->ntpme = ft_atoi(args[counter]);
-	din_table->forks = initialize_forks(din_table);
-	if (din_table->forks == NULL)
-		return (NULL);
-	din_table->philos = initialize_philosphers(din_table);
-	if (din_table->philos == NULL || din_table->nop == 0)
-		return (NULL);
-	if (pthread_mutex_init(&din_table->write, 0) != 0)
-		return (NULL);
-	return (din_table);
+	pthread_mutex_lock(&philo->table->eat_padlock);
+	if (now() - philo->last_eat >= philo->table->time_to_die)
+	{
+		print_action(philo, DIE);
+		is_time_to_finish(philo, YES);
+		pthread_mutex_unlock(&philo->table->eat_padlock);
+		return (1);
+	}
+	else if (philo->table->must_eat_times > 0
+		&& philo->eat_count >= philo->table->must_eat_times)
+	{
+		philo->table->ate_enough++;
+		if (philo->table->ate_enough >= philo->table->philosophers)
+		{
+			is_time_to_finish(philo, YES);
+			print_action(philo, FINISH);
+			pthread_mutex_unlock(&philo->table->eat_padlock);
+			return (1);
+		}
+	}
+	pthread_mutex_unlock(&philo->table->eat_padlock);
+	return (0);
 }
 
-/*
- ** Mr mayhem check for a reason to kill
- ** one of the philospher either their
- ** time to die or number_of_times_each_philosopher_must_eat
- ** Each philosopher has it's own death master
- */
-void	*mr_mayhem(void *data)
+void	time_to_eat(t_philo *philo)
+{
+	if (philo->id % 2 == 0)
+	{
+		pthread_mutex_lock(&philo->table->fork_padlock[philo->l_fork]);
+		pthread_mutex_lock(&philo->table->fork_padlock[philo->r_fork]);
+	}
+	else
+	{
+		pthread_mutex_lock(&philo->table->fork_padlock[philo->r_fork]);
+		pthread_mutex_lock(&philo->table->fork_padlock[philo->l_fork]);
+	}
+	print_action(philo, TAKE);
+	print_action(philo, TAKE);
+	print_action(philo, EAT);
+	advance_time(philo, philo->table->time_to_eat);
+	pthread_mutex_lock(&philo->table->eat_padlock);
+	philo->eat_count++;
+	philo->last_eat = now();
+	pthread_mutex_unlock(&philo->table->eat_padlock);
+	pthread_mutex_unlock(&philo->table->fork_padlock[philo->r_fork]);
+	pthread_mutex_unlock(&philo->table->fork_padlock[philo->l_fork]);
+}
+
+int	lone_philosopher(t_table *table)
+{
+	print_action(&table->philo[0], TAKE);
+	advance_time(&table->philo[0], table->time_to_die);
+	print_action(&table->philo[0], DIE);
+	is_time_to_finish(&table->philo[0], YES);
+	return (0);
+}
+
+void	*start_dinner(void *ptr)
 {
 	t_philo	*philo;
 
-	philo = (t_philo *)data;
-	while (philo->din_table->death)
+	philo = (t_philo *)ptr;
+	if (philo->id % 2 == 0)
+		usleep(philo->table->time_to_eat * 100);
+	while (1)
 	{
-		if (!philo->is_eating
-			&& ft_time_in_ms() - philo->lta >= philo->din_table->ttd)
+		if (philo->table->philosophers == 1)
 		{
-			pthread_mutex_lock(&philo->eating);
-			print_status(philo->din_table, philo->pid, "died\n");
-			philo->din_table->death = 0;
-			pthread_mutex_unlock(&philo->eating);
+			lone_philosopher(philo->table);
+			return (0);
 		}
-		if (philo->din_table->philos[philo->din_table->nop - 1]->nta
-			== philo->din_table->ntpme)
-			philo->din_table->death = 0;
-		usleep(100);
-	}
-	return (NULL);
+		if (is_time_to_finish(philo, NO))
+			return (0);
+		time_to_eat(philo);
+		print_action(philo, SLEEP);
+		advance_time(philo, philo->table->time_to_sleep);
+		print_action(philo, THINK);
+		
+		if (philo->table->philosophers % 2 != 0
+			&& philo->table->philosophers <= 127)
+			advance_time(philo, philo->table->time_to_eat);
+		//usleep(philo->table->time_to_eat * 10);	
+	}	
+	return (0);
 }
 
-/*
- ** Initialize threads and start philospher
- */
-int	start_threads(t_din *din_table)
+void	clean_table(t_table *table)
+{
+	free (table->philo);
+	free (table->fork_padlock);
+}
+
+void	destroy_padlocks(t_table *table)
 {
 	int	i;
 
-	i = 0;
-	din_table->st = ft_time_in_ms();
-	while (i < din_table->nop)
+	i = -1;
+	while (++i < table->philosophers)
+		pthread_mutex_destroy(&table->fork_padlock[i]);
+	clean_table(table);
+	pthread_mutex_destroy(&table->print_padlock);
+	pthread_mutex_destroy(&table->eat_padlock);
+	pthread_mutex_destroy(&table->finish_padlock);
+}
+
+void	finish_dinner(t_table *table)
+{
+	int	i;
+
+	i = -1;
+	while (++i < table->philosophers)
+		pthread_join(table->philo[i].thread, NULL);
+	destroy_padlocks(table);
+}
+
+void	start_dinner_monitor(t_table *table)
+{
+	int	i;
+	int	continue_flag;
+
+	continue_flag = 1;
+	while (continue_flag)
 	{
-		din_table->philos[i]->lta = ft_time_in_ms();
-		if (pthread_create(&din_table->philos[i]->thd_philo, NULL,
-			&start_routine, (void *)din_table->philos[i]) != 0)
-			return (ERROR);
-		i++;
+		i = -1;
+		table->ate_enough = 0;
+		while (++i < table->philosophers)
+		{
+			if (continue_flag && is_someone_dead_or_full(&table->philo[i]))
+				continue_flag = 0;
+		}
+		usleep(10);
+	}
+	finish_dinner(table);
+}
+
+int	turn_philosophers_in_threads(t_table *table)
+{
+	int	i;
+
+	i = -1;
+	while (++i < table->philosophers)
+	{
+		if (pthread_create(&table->philo[i].thread, NULL, \
+			start_dinner, &table->philo[i]))
+			return (exit_error("Couldn't create thread", table, 3));
+	}
+	return (1);
+}
+
+int	start_padlocks(t_table *table)
+{
+	int	i;
+
+	i = -1;
+	while (++i < table->philosophers)
+	{
+		if (pthread_mutex_init(&table->fork_padlock[i], NULL))
+			return (exit_error("Couldn't init forks mutex", table, 2));
+	}
+	if (pthread_mutex_init(&table->print_padlock, NULL))
+		return  (exit_error("Couldn't init print mutex", table, 2));
+	if (pthread_mutex_init(&table->eat_padlock, NULL))
+		return (exit_error("Couldn't init eat mutex", table, 2));
+	if (pthread_mutex_init(&table->finish_padlock, NULL))
+		return (exit_error("Couldn't init finish mutex", table, 2));
+	return (1);
+}
+
+int	call_philosophers(t_table *table)
+{
+	int	i;
+
+	i = -1;
+	table->philo = malloc(sizeof(t_philo) * table->philosophers);
+	table->fork_padlock = malloc(sizeof(pthread_mutex_t) * table->philosophers);
+	if (!table->philo || !table->fork_padlock)
+		return (exit_error("Couldn't create the philosophers and forks", table, 1));
+	table->start_time = now();
+	while (++i < table->philosophers)
+	{
+		table->philo[i].id = i + 1;
+		table->philo[i].l_fork = i;
+		table->philo[i].r_fork = (i + 1) % table->philosophers;
+		table->philo[i].eat_count = 0;
+		table->philo[i].last_eat = table->start_time;
+		table->philo[i].table = table;
+	}
+	return (1);
+}
+
+int	set_table(t_table *table, int ac, char **av)
+{
+	if (ac < 5 || ac > 6)
+		return (exit_error("Wrong number of arguments", NULL, 0));
+	table->philosophers = ft_atoi(av[1]);
+	table->time_to_die = ft_atoi(av[2]);
+	table->time_to_eat = ft_atoi(av[3]);
+	table->time_to_sleep = ft_atoi(av[4]);
+	if (ac == 6)
+		table->must_eat_times = ft_atoi(av[5]);
+	else
+		table->must_eat_times = -1;
+	if (table->philosophers < 1 || table->time_to_die < 1
+		|| table->time_to_eat < 1 || table->time_to_sleep < 1
+		|| (ac == 6 && table->must_eat_times < 1))
+		return (exit_error("Invalid arguments", NULL, 0));
+	table->finish_flag = 0;
+	return (1);
+}
+
+int	main(int ac, char **av)
+{
+	t_table	table;
+
+	if (!set_table(&table, ac, av))
+		return (1);
+	if (!call_philosophers(&table))
+		return (1);
+	if (!start_padlocks(&table))
+		return (1);
+	if(!turn_philosophers_in_threads(&table))
+		return (1);
+	start_dinner_monitor(&table);
+}
+
+void	advance_time(t_philo *philo, long long stop)
+{
+	long long	begin;
+
+	begin = now();
+	while (!is_time_to_finish(philo, NO) && (now() - begin) < stop)
 		usleep(100);
-	}
-	i = 0;
-	while (i < din_table->nop)
-	{
-		if (pthread_create(&din_table->philos[i]->myhem, NULL, &mr_mayhem,
-		(void *)din_table->philos[i]) != 0)
-			return (ERROR);
-		usleep(100);
-		i++;
-	}
-	while (din_table->death)
-		continue ;
-	return (GOOD);
 }
 
-int	main(int argc, char **argv)
-{
-	t_din	*din_table;
-	int		p_counter;
-
-	p_counter = 0;
-	din_table = NULL;
-	if (check_arg_validity(argc, argv) != GOOD)
-	{
-		write(2, "Error: Invalid Argument\n", 23);
-		return (ERROR);
-	}
-	din_table = fill_table(argc, argv);
-	if (din_table == NULL)
-		return (ERROR);
-	if (start_threads(din_table) != GOOD)
-		return (ERROR);
-	return (GOOD);
-}
-
-/*
- ** Print status using a write mutex
- ** to avoid other philospher status be scrambled or intertwined
- ** with another philosopher’s status.
- */
-void	print_status(t_din *din_table, int pid, char *string)
-{
-	pthread_mutex_lock(&din_table->write);
-	printf("%lld %d %s", ft_time_in_ms() - din_table->st, pid + 1, string);
-	if (string[0] != 'd')
-		pthread_mutex_unlock(&din_table->write);
-}
-
-/*
- ** Philosopher get both forks then start eating
- ** for an amount of time ( tte ).
- */
-void	eat_routine(t_philo *philo)
-{
-	pthread_mutex_lock(&philo->din_table->forks[philo->lf]);
-	print_status(philo->din_table, philo->pid, "taken left fork\n");
-	pthread_mutex_lock(&philo->din_table->forks[philo->rf]);
-	print_status(philo->din_table, philo->pid, "taken right fork\n");
-	pthread_mutex_lock(&philo->eating);
-	print_status(philo->din_table, philo->pid, "is eating\n");
-	philo->lta = ft_time_in_ms();
-	philo->is_eating = 1;
-	usleep(philo->din_table->tte * 1000 - 16000);
-	while (ft_time_in_ms() - philo->lta < philo->din_table->tte)
-		continue ;
-	philo->nta++;
-	philo->is_eating = 0;
-	pthread_mutex_unlock(&philo->eating);
-	pthread_mutex_unlock(&philo->din_table->forks[philo->lf]);
-	pthread_mutex_unlock(&philo->din_table->forks[philo->rf]);
-	return ;
-}
-
-/*
- ** Philospher time to sleep routine.
- */
-void	sleep_routine(t_philo *philo)
+void	print_action(t_philo *philo, const char *status)
 {
 	long long	time;
 
-	print_status(philo->din_table, philo->pid, "is sleeping\n");
-	time = ft_time_in_ms();
-	usleep(philo->din_table->tts * 1000 - 16000);
-	while (ft_time_in_ms() - time < philo->din_table->tts)
-		continue ;
-	return ;
-}
-
-/*
- ** Philospher time to think routine
- */
-void	think_routine(t_philo *philo)
-{
-	print_status(philo->din_table, philo->pid, "is thinking\n");
-	return ;
-}
-
-/*
- ** Routine start here with infinite loop
- ** that includes all routines that philospher must do
- ** which are eat - sleep - think.
- */
-void	*start_routine(void *data)
-{
-	t_philo	*philo;
-
-	philo = (t_philo *)data;
-	while (philo->din_table->death)
+	pthread_mutex_lock(&philo->table->print_padlock);
+	if (!is_time_to_finish(philo, NO))
 	{
-		eat_routine(philo);
-		sleep_routine(philo);
-		think_routine(philo);
-		usleep(100);
+		time = now() - philo->table->start_time;
+		printf("%lld %d %s\n", time, philo->id, status);
 	}
-	return (NULL);
+	pthread_mutex_unlock(&philo->table->print_padlock);
+	if (status[0] == 'f')
+		printf("%s\n", FINISH_MSG);
 }
 
-int	ft_check(unsigned long pt, int s)
+long long	now(void)
 {
-	if (pt > 9223372036854775807 && s == -1)
-		return (0);
-	else if (pt > 2147483647)
-		return (OFLOW);
-	return (pt * s);
+	struct timeval	timeval;
+
+	gettimeofday(&timeval, NULL);
+	return ((timeval.tv_sec * 1000) + (timeval.tv_usec / 1000));
 }
 
-int	ft_atoi(const char *str)
+int	exit_error(char *msg, t_table *table, int n)
 {
-	unsigned long long int	j;
-	unsigned long long int	t_p;
-	int						tt;
-
-	tt = 1;
-	j = 0;
-	t_p = 0;
-	while (*str >= 8 && *str <= 32)
-	{
-		if (*str == 27)
-			return (0);
-		str++;
-	}
-	if (*str == '-')
-	{
-		tt = -1;
-		str++;
-	}
-	else if (*str == '+')
-		str++;
-	while (*(str + j) >= 48 && *(str + j) <= 57)
-		t_p = t_p * 10 + (unsigned long long int)(*(str + j++) - '0');
-	return (ft_check(t_p, tt));
+	printf("Error: %s\n", msg);
+	if (n == 1)
+		clean_table(table);
+	if (n == 2)
+		destroy_padlocks(table);
+	if (n == 3)
+		finish_dinner(table);
+	return (0);
 }
 
-/* Mainly check if the in string
- ** doesn't contain any ascii than numbers
- */
-int	ft_is_number(char *string)
+int	ft_atoi(const char *s)
 {
-	int	i;
+	int	r;
+	int	sg;
 
-	i = 0;
-	while (string[i] != EOL)
+	r = 0;
+	sg = 1;
+	if (*s == '+' || *s == '-')
 	{
-		if (string[i] <= '0' || string[i] >= '9')
-			return (ERROR);
-		i++;
+		if (*s == '-')
+			sg *= -1;
+		s++;
 	}
-	return (GOOD);
-}
-
-/*
- ** Get the current time in ms
- */
-long long	ft_time_in_ms(void)
-{
-	struct timeval	te;
-	long long		milliseconds;
-
-	gettimeofday(&te, NULL);
-	milliseconds = te.tv_sec * 1000LL + te.tv_usec / 1000;
-	return (milliseconds);
-}
-
-/*
- ** Initialize philosophers struct
- */
-t_philo	**initialize_philosphers(t_din *din_table)
-{
-	t_philo	**philos;
-	int		i;
-
-	i = 0;
-	philos = (t_philo **)malloc(sizeof(t_philo *) * din_table->nop + 1);
-	if (philos == NULL)
-		return (NULL);
-	while (i < din_table->nop)
+	while (*s)
 	{
-		philos[i] = (t_philo *)malloc(sizeof(t_philo) * 1);
-		if (philos[i] == NULL)
-			return (NULL);
-		if (pthread_mutex_init(&philos[i]->eating, 0) != 0)
-			return (NULL);
-		philos[i]->din_table = din_table;
-		philos[i]->pid = i;
-		philos[i]->is_eating = 0;
-		philos[i]->nta = 0;
-		philos[i]->lf = i;
-		philos[i]->rf = (i + 1) % philos[i]->din_table->nop;
-		i++;
+		if (*s < '0' || *s > '9')
+			return (-1);
+		else if (*s >= '0' && *s <= '9')
+			r = (r * 10) + (*s - '0');
+		s++;
 	}
-	return (philos);
-}
-
-pthread_mutex_t	*initialize_forks(t_din *din_table)
-{
-	pthread_mutex_t	*forks;
-	int				i;
-
-	i = 0;
-	if (din_table->nop == OFLOW || din_table->ttd == OFLOW
-		|| din_table->tte == OFLOW || din_table->tts == OFLOW
-		|| din_table->ntpme == OFLOW)
-	{
-		write(2, "Error: Invalid Argument\n", 23);
-		return (NULL);
-	}
-	forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * din_table->nop);
-	if (forks == NULL)
-		return (NULL);
-	while (i < din_table->nop)
-	{
-		if (pthread_mutex_init(&forks[i], 0) != 0)
-			return (NULL);
-		i++;
-	}
-	return (forks);
+	return (sg * r);
 }
